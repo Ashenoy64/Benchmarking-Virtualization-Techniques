@@ -1,0 +1,31 @@
+{
+    "Env": {
+        "LD_LIBRARY_PATH": "/.local/usr/lib/x86_64-linux-gnu",
+        "PATH": "./local/usr/lib/x86_64-linux-gnu/"
+    },
+    "MapDirs": {
+        "./.venv/*": "/.local",
+        "./usr/lib64/*": "/.local/usr/lib/x86_64-linux-gnu"
+    },
+    "Files": [
+        "async_greeter_client.py",
+        "async_greeter_client_with_options.py",
+        "async_greeter_server.py",
+        "async_greeter_server_with_graceful_shutdown.py",
+        "async_greeter_server_with_reflection.py",
+        "config.json",
+        "Dockerfile",
+        "greeter_client.py",
+        "greeter_client_reflection.py",
+        "greeter_client_with_options.py",
+        "greeter_server.py",
+        "greeter_server_with_reflection.py",
+        "helloworld_pb2_grpc.py",
+        "helloworld_pb2.py",
+        "helloworld_pb2.pyi",
+        "helloworld.proto",
+        "README.md",
+        "requirements.txt"
+    ]
+}
+

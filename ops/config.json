@@ -1,0 +1,12 @@
+{
+	"MapDirs":{
+	".venv/*":"/.local",
+		"usr/lib64/*": "/usr/lib"
+	},
+	"Args":[
+	"server.py"
+	],
+	"Files":[
+	"server.py","hello_pb2_grpc.py","hello.proto","hello_pb2.py"
+]
+}
