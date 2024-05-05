@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+message File {
+  string filename = 1;
+  bytes content = 2;
+}
+
+service FileProcessingService {
+  rpc GetWordCount(File) returns (WordCountResponse) {}
+
+  rpc ReadFile(File) returns (stream FileChunk) {}
+
+  rpc UploadFile(stream FileChunk) returns (UploadStatus) {}
+
+}
+
+message WordCountResponse {
+  repeated WordCount word_counts = 1;
+}
+
+message WordCount {
+  string word = 1;
+  int32 count = 2;
+}
+
+message FileChunk {
+  bytes data = 1;
+}
+
+message UploadStatus {
+  bool success = 1;
+}
+

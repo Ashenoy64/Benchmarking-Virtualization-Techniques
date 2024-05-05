@@ -1,0 +1,23 @@
+{
+    "Env": {
+        "LD_LIBRARY_PATH": "/.local/usr/lib/x86_64-linux-gnu",
+        "PATH": "./local/usr/lib/x86_64-linux-gnu/"
+    },
+    "MapDirs": {
+        "./.venv/*": "/.local",
+        "./usr/lib64/*": "/.local/usr/lib/x86_64-linux-gnu"
+    },
+    
+    "Dirs": ["./ServerData"],
+    "Files": [
+        "Server.py",
+        "FileProcess_pb2_grpc.py",
+        "FileProcess_pb2.py",
+        "FileProcess_pb2.pyi",
+        "FileProcess.proto"
+    ],
+    "Mounts": {
+        "server_data": "./ServerData"
+    }
+}
+

@@ -1,3 +1,7 @@
 .venv
 *.log
 *.ext4
+__pycache__
+mnt
+mnt/
+*.ext4.old
