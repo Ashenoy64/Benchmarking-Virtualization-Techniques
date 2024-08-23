@@ -1,0 +1,20 @@
+#!/bin/bash
+
+
+# Get all container IDs (running and stopped)
+CONTAINER_IDS=$(sudo docker ps -aq)
+
+if [ -z "$CONTAINER_IDS" ]; then
+  echo "No containers found to remove."
+else
+  # Stop and remove all containers
+  echo "Stopping and removing all containers..."
+  sudo docker rm -f $CONTAINER_IDS
+fi
+
+# Prune any remaining stopped containers (if any)
+echo "Removing any remaining stopped containers..."
+sudo docker container prune -f
+
+echo "All containers have been removed."
+

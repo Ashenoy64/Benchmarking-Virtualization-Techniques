@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Check if a port number was provided
+if [ -z "$1" ]; then
+  echo "Usage: $0 <port>"
+  exit 1
+fi
+
+PORT=$1
+
+# Find the process ID (PID) using the specified port
+PID=$(lsof -t -i :$PORT)
+
+# Check if any process is using the port
+if [ -z "$PID" ]; then
+  echo "No process is using port $PORT."
+  exit 0
+fi
+
+# Display the details of the process using the port
+echo "Process using port $PORT:"
+lsof -i :$PORT
+
+# Ask the user if they want to kill the process
+read -p "Do you want to kill this process? (y/n) " choice
+
+if [ "$choice" = "y" ]; then
+  # Kill the process
+  kill -9 $PID
+  echo "Process $PID killed."
+else
+  echo "Process not killed."
+fi
+
