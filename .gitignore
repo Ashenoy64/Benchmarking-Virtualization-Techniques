@@ -1,4 +1,5 @@
 .venv
+vmlinux
 *.log
 *.ext4
 __pycache__

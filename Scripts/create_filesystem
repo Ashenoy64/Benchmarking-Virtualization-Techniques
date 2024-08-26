@@ -6,16 +6,28 @@ if [ "$#" -lt 2 ]; then
     exit 1
 fi
 
+# Define the base directory for Firecracker
+BASE_DIR="/home/user/GRPC/Go/Firecracker"
+
 # Assign command-line arguments to variables
 IMG_ID=$1
 FS=$2
 SIZE=${3:-800M}  # Default to 800M if the third argument is not provided
 
+# Check if the Firecracker directory exists, if not, create it
+if [ ! -d "$BASE_DIR" ]; then
+    echo "Directory $BASE_DIR does not exist. Creating it now..."
+    mkdir -p "$BASE_DIR"
+fi
+
+# Change to the Firecracker directory
+cd "$BASE_DIR" || { echo "Failed to change directory to $BASE_DIR"; exit 1; }
+
 # Generate a container ID
 CONTAINER_ID=$(docker run -td "$IMG_ID" /bin/bash)
 
 # Define the mount directory
-MOUNTDIR=mnt
+MOUNTDIR="mnt"
 
 # Create the mount directory if it doesn't exist
 if [ ! -d "$MOUNTDIR" ]; then
@@ -34,6 +46,12 @@ docker cp "$CONTAINER_ID":/ "$MOUNTDIR"
 
 # Unmount the filesystem
 umount "$MOUNTDIR"
+
+# Change permissions of the filesystem image
 chmod 777 "$FS"
+
+# Clean up by removing the container
+docker rm -f "$CONTAINER_ID"
+
 echo "Process completed successfully with FS size $SIZE."
 

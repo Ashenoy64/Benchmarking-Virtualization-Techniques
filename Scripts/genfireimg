@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd $ws/Scripts
+sudo ./create_filesystem go-unary:1.0 Unary.ext4 1200M
+sudo ./create_filesystem go-server-streaming:1.0 ServerStreaming.ext4 1200M
+sudo ./create_filesystem go-client-streaming:1.0 ClientStreaming.ext4 1200M
+sudo ./create_filesystem go-bi-streaming:1.0 BiStreaming.ext4 1200M

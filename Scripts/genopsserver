@@ -36,8 +36,8 @@ build_and_move() {
 # Build and move binaries for different services
 build_and_move "BiStreaming" "BiStreamingServer" "Server.go"
 build_and_move "ServerStreaming" "ServerStreamingServer" "Server.go"
-build_and_move "ClientStreaming" "ClientStreamingServer" "server.go"
-build_and_move "Unary" "UnaryServer" "server.go"
+build_and_move "ClientStreaming" "ClientStreamingServer" "Server.go"
+build_and_move "Unary" "UnaryServer" "Server.go"
 
 echo "All clients built and moved successfully."
 
