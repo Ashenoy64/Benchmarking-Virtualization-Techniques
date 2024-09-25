@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# Check if enough arguments are passed
+if [ "$#" -lt 2 ]; then
+  echo "Usage: benchmark-test <pid> --log <log-file> --plot <plot-file> [--duration <duration>] [--sudo] [--include-children]"
+  exit 1
+fi
+
+# Initialize variables
+USE_SUDO=false
+INCLUDE_CHILDREN=false
+LOG_FILE=""
+PLOT_FILE=""
+DURATION=0
+PROCESS_PID=""
+
+# Parse flags
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    --log)
+      LOG_FILE="$2"
+      shift 2
+      ;;
+    --plot)
+      PLOT_FILE="$2"
+      shift 2
+      ;;
+    --duration)
+      DURATION="$2"
+      # Validate duration if it's provided
+      if [ -n "$DURATION" ] && ! [[ "$DURATION" =~ ^[0-9]+$ ]]; then
+        echo "Invalid duration format. Duration must be a positive integer."
+        exit 1
+      fi
+      shift 2
+      ;;
+    --sudo)
+      USE_SUDO=true
+      shift
+      ;;
+    --include-children)
+      INCLUDE_CHILDREN=true
+      shift
+      ;;
+    *)
+      if [ -z "$PROCESS_PID" ]; then
+        PROCESS_PID="$1"
+      else
+        echo "Error: Too many arguments. Only one PID is allowed."
+        exit 1
+      fi
+      shift
+      ;;
+  esac
+done
+
+# Check if a PID is provided
+if [ -z "$PROCESS_PID" ]; then
+  echo "Error: PID is required."
+  exit 1
+fi
+
+# Check if log and plot files are provided
+if [ -z "$LOG_FILE" ] || [ -z "$PLOT_FILE" ]; then
+  echo "Error: --log and --plot flags are required."
+  exit 1
+fi
+
+# Generate a default log file name with timestamp if not provided
+if [ -z "$LOG_FILE" ]; then
+  TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+  LOG_FILE="LOG_${TIMESTAMP}.csv"
+fi
+
+BASE_DIR="$grpc"
+
+# Verify if the PID is valid
+if ! ps -p $PROCESS_PID > /dev/null; then
+  echo "Invalid PID. Process with PID $PROCESS_PID does not exist."
+  exit 1
+fi
+
+# Build the psrecord command
+PSRECORD_CMD="psrecord $PROCESS_PID --log $BASE_DIR/Logs/$LOG_FILE --log-format csv --plot $BASE_DIR/Plots/$PLOT_FILE"
+
+# Include duration flag if it's greater than 0
+if [ "$DURATION" -gt 0 ]; then
+  PSRECORD_CMD="$PSRECORD_CMD --duration $DURATION"
+fi
+
+# Include the --include-children flag if requested
+if $INCLUDE_CHILDREN; then
+  PSRECORD_CMD="$PSRECORD_CMD --include-children"
+fi
+
+# Execute the psrecord command
+echo "Executing: $PSRECORD_CMD"
+$PSRECORD_CMD
+
+echo "COMPLETED MONITORING"
+

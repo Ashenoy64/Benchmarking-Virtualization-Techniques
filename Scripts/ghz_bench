@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# Default values
+REQUEST_TYPE=""
+N=10
+SIZE=200
+C=0
+REQUESTS=0
+IP="127.0.0.1"
+PORT="50051"
+BASE_DIR="$grpc/Proto"
+OUTPUT=""
+FORMAT="--format=summary"
+LOG_DIR="/home/user/GRPC/Logs"
+
+# Parse command line arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --type)
+            REQUEST_TYPE="$2"
+            shift 2
+            ;;
+        --low)
+            LOW="$2"
+            shift 2
+            ;;
+        --high)
+            HIGH="$2"
+            shift 2
+            ;;
+        --size)
+            SIZE="$2"
+            shift 2
+            ;;
+        --n)
+            N="$2"
+            shift 2
+            ;;
+        --host)
+            IP="$2"
+            shift 2
+            ;;
+        --port)
+            PORT="$2"
+            shift 2
+            ;;
+        --out)
+            OUTPUT="--output=$LOG_DIR/$2"
+            FORMAT="--format=csv"
+            shift 2
+            ;;
+        -c)
+            C="$2"
+            shift 2
+            ;;
+        -n)
+            REQUESTS="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown parameter passed: $1"
+            exit 1
+            ;;
+    esac
+done
+
+ADDR="$IP:$PORT"
+
+# Ensure required arguments are provided
+if [[ -z "$REQUEST_TYPE" || -z "$C" || -z "$REQUESTS" ]]; then
+    echo "Usage: ghz_bench --type <unary|client-streaming|server-streaming|bi-streaming> [--low <low range>] [--high <high range>] [--size <size>] [--host <IP>] [--port <port>] -c <concurrency> -n <requests> --out <CSVFILE>"
+    exit 1
+fi
+
+# Prepare the command arguments
+GHZ_CMD_ARGS="-c $C -n $REQUESTS $ADDR"
+
+# Conditionally add OUTPUT and FORMAT only if --out was provided
+if [[ -n "$OUTPUT" ]]; then
+    GHZ_CMD_ARGS="$GHZ_CMD_ARGS $OUTPUT $FORMAT"
+else
+    GHZ_CMD_ARGS="$GHZ_CMD_ARGS $FORMAT"
+fi
+
+# Handle different request types
+case $REQUEST_TYPE in
+    unary)
+        echo "Executing unary request..."
+        ghz --insecure --proto="$BASE_DIR/prime.proto" --call="prime.PrimeService.get_nth_prime" -d '{"n":"{{randomInt '"$LOW"' '"$HIGH"'}}"}' $GHZ_CMD_ARGS
+        ;;
+    client-streaming)
+        echo "Executing client-streaming request..."
+        python3 "$BASE_DIR/generate_stream.py" client_streaming "$LOW" "$HIGH" "$SIZE" "$BASE_DIR/data.json"
+        ghz --insecure --proto="$BASE_DIR/median.proto" --call="median.FindMedianService.get_median" --data-file "$BASE_DIR/data.json" $GHZ_CMD_ARGS
+        ;;
+    server-streaming)
+        echo "Executing server-streaming request..."
+        ghz --insecure --proto="$BASE_DIR/NPrime.proto" --call="NPrime.GetNPrime" -d '{"number":"{{randomInt '"$LOW"' '"$HIGH"'}}"}' $GHZ_CMD_ARGS
+        ;;
+    bi-streaming)
+        echo "Executing bi-streaming request..."
+        python3 "$BASE_DIR/generate_stream.py" bi_streaming "$LOW" "$HIGH" "$SIZE" "$BASE_DIR/data.json"
+        ghz --insecure --proto="$BASE_DIR/InverseMatrix.proto" --call="InverseMatrix.GetInverseMatrix" --data-file "$BASE_DIR/data.json" $GHZ_CMD_ARGS
+        ;;
+    *)
+        echo "Invalid request type: $REQUEST_TYPE"
+        exit 1
+        ;;
+esac
+

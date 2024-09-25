@@ -2,5 +2,5 @@ API_SOCKET="/tmp/firecracker.sock"
 
 sudo rm -f $API_SOCKET
 
-../firecracker --api-sock  "${API_SOCKET}"
+$ws/Firecracker/firecracker --api-sock  "${API_SOCKET}"
 

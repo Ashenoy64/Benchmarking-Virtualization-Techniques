@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Default values
+DEFAULT_IP="localhost"
+DEFAULT_DURATION=86400  # 24 hours
+
+# Get optional arguments from command-line
+DURATION=${1:-$DEFAULT_DURATION}
+IP_ADDRESS=${2:-$DEFAULT_IP}
+
+# Define a timestamp for uniquely naming the profile files
+TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+
+# Directory to save profiles
+OUTPUT_DIR="$grpc/profiles_$TIMESTAMP"
+mkdir -p $OUTPUT_DIR
+
+echo "Using IP Address: $IP_ADDRESS"
+echo "Profiling for $DURATION seconds..."
+
+echo "Capturing CPU profile for $DURATION seconds..."
+curl "http://$IP_ADDRESS:6060/debug/pprof/profile?seconds=$DURATION" --output "$OUTPUT_DIR/cpu_profile.prof" &
+CPU_PID=$!
+
+echo "Capturing heap profile..."
+curl http://$IP_ADDRESS:6060/debug/pprof/heap --output "$OUTPUT_DIR/heap_profile.prof" &
+HEAP_PID=$!
+
+echo "Capturing goroutine profile..."
+curl http://$IP_ADDRESS:6060/debug/pprof/goroutine --output "$OUTPUT_DIR/goroutine_profile.prof" &
+GOROUTINE_PID=$!
+
+echo "Capturing threadcreate profile..."
+curl http://$IP_ADDRESS:6060/debug/pprof/threadcreate --output "$OUTPUT_DIR/threadcreate_profile.prof" &
+THREADCREATE_PID=$!
+
+echo "Capturing block profile..."
+curl http://$IP_ADDRESS:6060/debug/pprof/block --output "$OUTPUT_DIR/block_profile.prof" &
+BLOCK_PID=$!
+
+# Wait for CPU profiling to finish or terminate it manually with CTRL+C
+wait $CPU_PID
+
+echo "CPU profiling completed."
+
+# Wait for other profiles to finish as well
+wait $HEAP_PID
+wait $GOROUTINE_PID
+wait $THREADCREATE_PID
+wait $BLOCK_PID
+
+echo "All profiling tasks completed. Profiles are saved in the $OUTPUT_DIR directory."
+
