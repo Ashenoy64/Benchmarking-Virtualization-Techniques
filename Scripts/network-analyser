@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [[ $# -lt 2 || $# -gt 2 ]]; then
+	echo "Usage: ./network-analyser <Pid> <output-pcap-file-name>"
+	exit 0
+fi
+p=$(cat ~/.passwd)
+echo "$p"|sudo -S  nsenter -t "$1" -n tshark -i any -f "tcp" -w /tmp/"$2"
+
+echo "$p"|sudo -S  mv /tmp/"$2" ~/GRPC/Go/Pcaps/
+
+echo "$p"|sudo -S chmod 777 ~/GRPC/Go/Pcaps/"$2"
+
+

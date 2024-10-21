@@ -12,7 +12,7 @@ IP_ADDRESS=${2:-$DEFAULT_IP}
 TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
 
 # Directory to save profiles
-OUTPUT_DIR="$grpc/profiles_$TIMESTAMP"
+OUTPUT_DIR="$grpc/profiles_$3"
 mkdir -p $OUTPUT_DIR
 
 echo "Using IP Address: $IP_ADDRESS"

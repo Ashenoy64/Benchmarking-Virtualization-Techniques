@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+dest=/home/user/FinalLogs/$1
+
+mkdir $dest
+
+#Pcap
+mv $grpc/Go/Pcaps/$1.pcap $dest
+
+#Perf
+mv $grpc/Logs/$1.data $dest
+
+#Resource usage
+mv $grpc/Logs/$1.csv $dest
+
+#Go profile
+mv $grpc/profiles_$1 $dest
+
+
+#Generate Flamegraph
+sudo perf script -f -i $dest/$1.data| ~/FlameGraph/stackcollapse-perf.pl > out.perf-folded
+~/FlameGraph/flamegraph.pl out.perf-folded> $dest/$1.svg
+
+#Generate Plots
+
+
+
+
+

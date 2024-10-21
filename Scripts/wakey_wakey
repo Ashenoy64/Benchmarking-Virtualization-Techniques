@@ -1,0 +1,2 @@
+#!/bin/bash
+wakeonlan -i 10.10.3.95 78:2b:cb:a3:d5:6f

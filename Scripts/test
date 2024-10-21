@@ -1,0 +1,7 @@
+#!/bin/bash
+
+p=$(cat .passwd)
+echo $p>>t
+
+
+

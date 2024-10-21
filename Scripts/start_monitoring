@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# Check if enough arguments are provided
+if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <test_name> <pid> <time_duration> <host>"
+    exit 1
+fi
+
+test_name=$1
+pid=$2
+output_file="$test_name.data"
+filename="$test_name.csv"
+pcap_filename="$test_name.pcap"
+go_profile="$test_name"
+time_duration=$3
+host=$4
+
+ws=/home/user/Benchmarking-Virtualization-Techniques/Scripts
+# Start processes in the background and track their PIDs
+# Start processes in new screen sessions and track their PIDs
+
+cd $ws
+
+screen -t perf run_perf "$pid" "$output_file"
+pid_perf=$!
+
+screen -t resources resource_utils "$pid" --log "$filename" &
+pid_resource=$!
+
+screen -t network network-analyser "$pid" "$pcap_filename" &
+pid_network=$!
+
+screen -t go-profile go_profile "$time_duration" "$host" "$go_profile"&
+pid_profile=$!
+
+# Wait for all processes to finish (optional)
+# wait $pid_perf $pid_resource $pid_network $pid_profile $pid_bench
+
+echo "Started processes with PIDs:"
+echo "run_perf PID: $pid_perf"
+echo "resourse_utils PID: $pid_resource"
+echo "network-analyser PID: $pid_network"
+echo "go_profile PID: $pid_profile"

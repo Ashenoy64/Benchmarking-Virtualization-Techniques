@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd "$grpc/Go/Unary"
+sudo docker build -t go-unary:3.0  .
+
+cd "$grpc/Go/BiStreaming"
+sudo docker build -t go-bi-streaming:1.0 .
+
+cd "$grpc/Go/ServerStreaming"
+sudo docker build -t go-server-streaming:1.0 .
+
+cd "$grpc/Go/ClientStreaming"
+sudo  docker build -t go-client-streaming:2.0 .

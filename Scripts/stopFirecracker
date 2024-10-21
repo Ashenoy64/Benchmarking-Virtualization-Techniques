@@ -18,7 +18,12 @@ if [ -n "$FC_PID" ]; then
 fi
 
 # Clean up TAP device
-sudo ip link del tap0
+echo "password"|sudo -S ip link del tap0
+
+sudo iptables -t nat -D PREROUTING -p tcp --dport 50051 -j DNAT --to-destination 172.16.0.2:50051
+sudo iptables -t nat -D POSTROUTING -j MASQUERADE
+sudo iptables -t nat -D PREROUTING -p tcp --dport 6060 -j DNAT --to-destination 172.16.0.2:6060
+sudo iptables -t nat -D POSTROUTING -j MASQUERADE
 
 echo "Firecracker instance stopped and resources cleaned up."
 

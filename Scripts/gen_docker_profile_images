@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd "$grpc/Go/Unary"
+sudo docker build -t go-unary-profile:1.0 -f Dockerfile.Profile .
+
+cd "$grpc/Go/BiStreaming"
+sudo docker build -t go-bi-streaming-profile:1.0 -f Dockerfile.Profile .
+
+cd "$grpc/Go/ServerStreaming"
+sudo docker build -t go-server-streaming-profile:1.0 -f Dockerfile.Profile .
+
+cd "$grpc/Go/ClientStreaming"
+sudo  docker build -t go-client-streaming-profile:1.0 -f Dockerfile.Profile .

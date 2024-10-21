@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rm $grpc/Go/Pcaps/$1.pcap
+rm $grpc/Logs/$1.data 
+rm -r $grpc/profiles_$1

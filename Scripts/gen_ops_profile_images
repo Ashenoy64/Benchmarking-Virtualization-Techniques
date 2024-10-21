@@ -13,11 +13,11 @@ fi
 cd "$grpc" || exit
 
 # Check if the Clients directory exists, if not, create it
-if [ ! -d "Clients" ]; then
+if [ ! -d "OPS" ]; then
     mkdir OPS
-    echo "Created Clients directory."
+    echo "Created OPS directory."
 else
-    echo "Clients directory already exists."
+    echo "OPS directory already exists."
 fi
 
 # Function to build the Go client and move the binary to the Clients directory
@@ -34,10 +34,10 @@ build_and_move() {
 }
 
 # Build and move binaries for different services
-build_and_move "BiStreaming" "BiStreamingServer" "Server.go"
-build_and_move "ServerStreaming" "ServerStreamingServer" "Server.go"
-build_and_move "ClientStreaming" "ClientStreamingServer" "Server.go"
-build_and_move "Unary" "UnaryServer" "Server.go"
+build_and_move "BiStreaming" "bi-streaming" "ServerProfile.go"
+build_and_move "ServerStreaming" "server-streaming" "ServerProfile.go"
+build_and_move "ClientStreaming" "client-streaming" "ServerProfile.go"
+build_and_move "Unary" "unary" "ServerProfile.go"
 
-echo "All clients built and moved successfully."
+echo "All servers built and moved successfully."
 

@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Usage: ./deploy_profiles.sh <Docker|Gvisor|OPS|Firecracker>
+# Example: ./deploy_profiles.sh Docker
+
+TARGET=$1
+
+# Base directory where profile files are located
+BASE_DIR="/home/user/Profile/$TARGET"
+
+# Check if the target directory exists
+if [[ ! -d "$BASE_DIR" ]]; then
+    echo "Error: Directory $BASE_DIR does not exist."
+    exit 1
+fi
+
+# IP address of the remote machine (your machine's IP)
+REMOTE_IP="10.10.3.140"
+
+# Mapping ports for different profiles
+declare -A PORTS
+PORTS["cpu_profile"]=8081
+PORTS["block_profile"]=8082
+PORTS["heap_profile"]=8083
+PORTS["goroutine_profile"]=8084
+
+
+killport 8081
+killport 8082
+killport 8083
+killport 8084
+# Array of profile files
+PROFILES=("cpu_profile.prof" "block_profile.prof" "heap_profile.prof" "goroutine_profile.prof")
+
+# Function to start the pprof web interface
+start_pprof() {
+    local PROFILE_FILE=$1
+    local PORT=$2
+
+    if [[ -f "$PROFILE_FILE" ]]; then
+        echo "Starting pprof web interface for $PROFILE_FILE on ${REMOTE_IP}:${PORT}..."
+        go tool pprof -http="${REMOTE_IP}:${PORT}" "$PROFILE_FILE" &
+        echo "pprof started at http://${REMOTE_IP}:${PORT} for $PROFILE_FILE"
+    else
+        echo "Profile file $PROFILE_FILE not found. Skipping..."
+    fi
+}
+
+# Loop through the profiles and start the web interface
+for PROFILE in "${PROFILES[@]}"; do
+    # Extract profile type without extension (cpu_profile, block_profile, etc.)
+    PROFILE_TYPE=$(basename "$PROFILE" .prof)
+
+    # Get the corresponding port for the profile type
+    PORT=${PORTS[$PROFILE_TYPE]}
+
+    # Start the pprof web interface for each profile
+    start_pprof "$BASE_DIR/$PROFILE" "$PORT"
+done
+
+# Wait for all background processes (pprof servers) to run
+wait

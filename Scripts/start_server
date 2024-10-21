@@ -1,0 +1,72 @@
+#!/bin/bash
+
+tech=$1
+type=$2
+
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 2 ]; then 
+    echo "Usage: start_server <technology> <test-type>"
+    exit 1
+fi
+
+# Start based on the technology
+if [ "$tech" == "docker" ]; then
+    echo "Starting Docker container for $type..."
+    container_id=$(docker run -d -p 50051:50051 -p 6060:6060 -m 4096m --cpus=2 go-"$type"-profile:1.0)
+    
+    if [ $? -eq 0 ]; then
+        echo "Docker container started with ID: $container_id"
+	docker inspect "$container_id" | jq '.[].State.Pid'
+
+    else
+        echo "Failed to start Docker container."
+        exit 1
+    fi
+
+elif [ "$tech" == "gvisor" ]; then
+    echo "Starting gVisor container for $type..."
+    container_id=$(docker run -d --runtime=runsc -p 50051:50051 -p 6060:6060 -m 4096m --cpus=2 go-"$type"-profile:1.0)
+    
+    if [ $? -eq 0 ]; then
+        echo "gVisor container started with ID: $container_id"
+	docker inspect "$container_id" | jq '.[].State.Pid'
+
+    else
+        echo "Failed to start gVisor container."
+        exit 1
+    fi
+
+elif [ "$tech" == "ops" ]; then
+    echo "Starting OPS server for $type..."
+    
+    p=$grpc/Go/OPS
+    cd $p
+    screen -t ops ops run -p 50051 -p 6060 -c "$p/config.json" "$p/$type" &
+    child=$(pgrep -P $(pidof ops))
+    if [ $? -eq 0 ]; then
+        echo "OPS server started successfully with Pid $child."
+    else
+        echo "Failed to start OPS server."
+        exit 1
+    fi
+
+elif [ "$tech" == "firecracker" ]; then
+	echo "Starting Firecracker for $type..."
+	screen -t firecracker startFirecracker
+	screen -t controller setup_firecracker_img $type.ext4
+	echo "Paste the below lines in firecracker window to setup networking"
+	echo "ip link set dev eth0 up "                                       
+	echo "ip addr add 172.16.0.2/30 dev eth0 "                             
+	echo "ip route add default via 172.16.0.1" 
+	if [ $? -eq 0 ]; then
+		sleep 2s
+		echo "Firecracker started successfully with Pid $(pidof firecracker)"
+	else
+		echo "Failed to start firecracker"
+		exit 1
+	fi
+else
+    echo "Unknown technology: $tech. Please use 'docker', 'gvisor', 'ops' or 'firecracker'."
+    exit 1
+fi
+
