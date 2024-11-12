@@ -12,7 +12,7 @@ fi
 # Start based on the technology
 if [ "$tech" == "docker" ]; then
     echo "Starting Docker container for $type..."
-    container_id=$(docker run -d -p 50051:50051 -p 6060:6060 -m 4096m --cpus=2 go-"$type"-profile:1.0)
+    container_id=$(docker run -d -p 50051:50051 -p 6060:6060 -m 16384m --cpuset-cpus=0-7 go-"$type"-profile:1.0)
     
     if [ $? -eq 0 ]; then
         echo "Docker container started with ID: $container_id"
@@ -25,7 +25,7 @@ if [ "$tech" == "docker" ]; then
 
 elif [ "$tech" == "gvisor" ]; then
     echo "Starting gVisor container for $type..."
-    container_id=$(docker run -d --runtime=runsc -p 50051:50051 -p 6060:6060 -m 4096m --cpus=2 go-"$type"-profile:1.0)
+    container_id=$(docker run -d --runtime=runsc -p 50051:50051 -p 6060:6060 -m 16384m --cpuset-cpus=0-7 go-"$type"-profile:1.0)
     
     if [ $? -eq 0 ]; then
         echo "gVisor container started with ID: $container_id"

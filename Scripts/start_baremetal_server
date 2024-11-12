@@ -1,0 +1,29 @@
+#!/bin/bash
+
+type=$1
+base="/home/user/GRPC/Go"
+
+if [ "$#" -ne 1 ]; then 
+	echo "Usage: start_baremetal_server <server-type>"
+	exit 1
+fi
+
+
+if [ "$type" == "unary" ]; then
+	echo "Starting unary server"
+	echo " sudo cgexec -g memory,cpuset:test-cgroup $base/Unary/main"
+
+	sudo cgexec -g memory,cpuset:test-cgroup $base/Unary/main
+elif [ "$type" == "client-streaming" ]; then
+	echo "Starting client-streaming server"
+	sudo cgexec -g memory,cpuset:test-cgroup $base/ClientStreaming/main
+elif [ "$type" == "server-streaming" ]; then
+	echo "Starting server-streaming server"
+	sudo cgexec -g memory,cpuset:test-cgroup $base/ServerStreaming/main
+elif [ "$type" == "bi-streaming" ]; then
+	echo "Starting bi-streaming server"
+	sudo cgexec -g memory,cpuset:test-cgroup $base/BiStreaming/main
+fi
+
+echo $!
+

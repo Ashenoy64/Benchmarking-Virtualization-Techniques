@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sudo mkdir /sys/fs/cgroup/$1
+echo "0-7" > sudo tee /sys/fs/cgroup/$1/cpuset.cpus
+echo "16G" > sudo tee /sys/fs/cgroup/$1/memory.max

@@ -103,8 +103,8 @@ curl --unix-socket "${API_SOCKET}" -i \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
     -d '{
-      "vcpu_count": 2,
-      "mem_size_mib": 4096
+      "vcpu_count": 8,
+      "mem_size_mib": 16384
     }'
 # The IP address of a guest is derived from its MAC address with
 # `fcnet-setup.sh`, this has been pre-configured in the guest rootfs. It is

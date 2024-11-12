@@ -27,11 +27,11 @@ pid_perf=$!
 screen -t resources resource_utils "$pid" --log "$filename" &
 pid_resource=$!
 
-screen -t network network-analyser "$pid" "$pcap_filename" &
-pid_network=$!
-
 screen -t go-profile go_profile "$time_duration" "$host" "$go_profile"&
 pid_profile=$!
+
+screen -t network network-analyser "$pid" "$pcap_filename" "$time_duration"&
+pid_network=$!
 
 # Wait for all processes to finish (optional)
 # wait $pid_perf $pid_resource $pid_network $pid_profile $pid_bench

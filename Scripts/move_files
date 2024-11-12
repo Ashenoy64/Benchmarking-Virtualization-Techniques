@@ -2,11 +2,11 @@
 
 
 dest=/home/user/FinalLogs/$1
-
-mkdir $dest
+#
+mkdir -p $dest
 
 #Pcap
-mv $grpc/Go/Pcaps/$1.pcap $dest
+#mv $grpc/Go/Pcaps/$1.pcap $dest
 
 #Perf
 mv $grpc/Logs/$1.data $dest
