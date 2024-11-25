@@ -41,15 +41,8 @@ elif [ "$tech" == "ops" ]; then
     
     p=$grpc/Go/OPS
     cd $p
-    screen -t ops ops run -p 50051 -p 6060 -c "$p/config.json" "$p/$type" &
-    child=$(pgrep -P $(pidof ops))
-    if [ $? -eq 0 ]; then
-        echo "OPS server started successfully with Pid $child."
-    else
-        echo "Failed to start OPS server."
-        exit 1
-    fi
-
+    #screen -t ops run_ops $type 
+    screen -t ops ops run "$p/$type" -c "$p/config.json" -p 50051 -p 6060
 elif [ "$tech" == "firecracker" ]; then
 	echo "Starting Firecracker for $type..."
 	screen -t firecracker startFirecracker

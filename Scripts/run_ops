@@ -1,0 +1,26 @@
+#!/bin/bash
+#read password from the file
+pass=$(cat ~/.passwd)
+
+# Set the base directory
+p=$grpc/Go/OPS
+
+# Change to the specified directory
+cd $p
+
+# Use the first argument passed to the script as the $type
+type=$1
+sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
+
+HOST_IFACE="eth0"
+#echo "$pass" | sudo -S iptables -t nat -D POSTROUTING -o "$HOST_IFACE" -j MASQUERADE || true
+#echo "$pass" | sudo -S iptables -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || true
+#echo "$pass" | sudo -S iptables -D FORWARD -i tap10 -o "$HOST_IFACE" -j ACCEPT || true
+#echo "$pass" | sudo -S iptables -t nat -A POSTROUTING -o "$HOST_IFACE" -j MASQUERADE
+#echo "$pass" | sudo -S iptables -I FORWARD 1 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+#echo "$pass" | sudo -S iptables -I FORWARD 1 -i tap10 -o "$HOST_IFACE" -j ACCEPT
+# Run the command with the provided type
+echo "$pass" |sudo -S iptables -t nat -A PREROUTING -p tcp --dport 50051 -j DNAT --to-destination 172.16.0.2:50051 
+echo "$pass" | sudo -S iptables -t nat -A POSTROUTING -j MASQUERADE
+/home/user/.ops/bin/ops run "$p/$type" -p 50049 -p 6060 -c "$p/config.json" -b -t tap10
+#ops run unary -c config.json -t tap10 -b  -p 50051 -p 6060
